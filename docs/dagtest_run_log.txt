@@ -1,0 +1,125 @@
+2026-11-11T00:53:56.123546Z [info     ] DAG bundles loaded: dags-folder [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:344
+2026-11-11T00:53:56.133793Z [warning  ] DAG bundle apache-airflow-providers-common-sql-example-dags is no longer found in config and has been disabled [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:451
+2026-11-11T00:53:56.136421Z [info     ] Deleted import errors for bundle apache-airflow-providers-common-sql-example-dags which is no longer configured [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:453
+2026-11-11T00:53:56.137097Z [warning  ] DAG bundle apache-airflow-providers-standard-example-dags is no longer found in config and has been disabled [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:451
+2026-11-11T00:53:56.138136Z [info     ] Deleted import errors for bundle apache-airflow-providers-standard-example-dags which is no longer configured [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:453
+2026-11-11T00:53:56.138542Z [warning  ] DAG bundle example_dags is no longer found in config and has been disabled [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:451
+2026-11-11T00:53:56.139337Z [info     ] Deleted import errors for bundle example_dags which is no longer configured [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:453
+2026-11-11T00:53:56.142707Z [info     ] Filling up the DagBag from /opt/airflow/dags [airflow.dag_processing.dagbag.BundleDagBag] loc=dagbag.py:583
+2026-11-11T00:53:56.172957Z [warning  ] The `airflow.decorators.dag` attribute is deprecated. Please use `'airflow.sdk.dag'`. [py.warnings] category=UserWarning filename=/opt/airflow/dags/phase1_sdi_pipeline.py lineno=4
+2026-11-11T00:53:56.173636Z [warning  ] The `airflow.decorators.task` attribute is deprecated. Please use `'airflow.sdk.task'`. [py.warnings] category=UserWarning filename=/opt/airflow/dags/phase1_sdi_pipeline.py lineno=4
+2026-11-11T00:53:56.214323Z [info     ] Bulk-writing dags to db        [airflow.serialization.definitions.dag] count=1 loc=dag.py:247
+2026-11-11T00:53:56.236984Z [info     ] get next_dagrun_info_v2        [airflow.serialization.definitions.dag] last_automated_run_info=None loc=dag.py:491 next_info=None
+2026-11-11T00:53:56.237586Z [info     ] setting next dagrun info       [airflow.models.dag] loc=dag.py:887 next_dagrun=None next_dagrun_create_after=None next_dagrun_data_interval_end=None next_dagrun_data_interval_start=None next_dagrun_partition_date=None next_dagrun_partition_key=None
+2026-11-11T00:53:56.916789Z [info     ] DAG bundles loaded: dags-folder [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:344
+2026-11-11T00:53:56.921582Z [warning  ] DAG bundle apache-airflow-providers-common-sql-example-dags is no longer found in config and has been disabled [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:451
+2026-11-11T00:53:56.922906Z [info     ] Deleted import errors for bundle apache-airflow-providers-common-sql-example-dags which is no longer configured [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:453
+2026-11-11T00:53:56.923251Z [warning  ] DAG bundle apache-airflow-providers-standard-example-dags is no longer found in config and has been disabled [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:451
+2026-11-11T00:53:56.924116Z [info     ] Deleted import errors for bundle apache-airflow-providers-standard-example-dags which is no longer configured [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:453
+2026-11-11T00:53:56.924596Z [warning  ] DAG bundle example_dags is no longer found in config and has been disabled [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:451
+2026-11-11T00:53:56.925378Z [info     ] Deleted import errors for bundle example_dags which is no longer configured [airflow.dag_processing.bundles.manager.DagBundlesManager] loc=manager.py:453
+2026-11-11T00:53:56.929605Z [info     ] Filling up the DagBag from /opt/airflow/dags [airflow.dag_processing.dagbag.BundleDagBag] loc=dagbag.py:583
+2026-11-11T00:53:56.942457Z [warning  ] The `airflow.decorators.dag` attribute is deprecated. Please use `'airflow.sdk.dag'`. [py.warnings] category=UserWarning filename=/opt/airflow/dags/phase1_sdi_pipeline.py lineno=4
+2026-11-11T00:53:56.942969Z [warning  ] The `airflow.decorators.task` attribute is deprecated. Please use `'airflow.sdk.task'`. [py.warnings] category=UserWarning filename=/opt/airflow/dags/phase1_sdi_pipeline.py lineno=4
+2026-11-11T00:53:56.955125Z [info     ] Bulk-writing dags to db        [airflow.serialization.definitions.dag] count=1 loc=dag.py:247
+2026-11-11T00:53:56.960906Z [info     ] get next_dagrun_info_v2        [airflow.serialization.definitions.dag] last_automated_run_info=None loc=dag.py:491 next_info=None
+2026-11-11T00:53:56.961506Z [info     ] setting next dagrun info       [airflow.models.dag] loc=dag.py:887 next_dagrun=None next_dagrun_create_after=None next_dagrun_data_interval_end=None next_dagrun_data_interval_start=None next_dagrun_partition_date=None next_dagrun_partition_key=None
+2026-11-11T00:53:57.007062Z [info     ] creating dag run               [airflow.serialization.definitions.dag] loc=dag.py:655 logical_date=DateTime(2026, 11, 11, 0, 0, 0, tzinfo=Timezone('UTC')) partition_key=None run_after=DateTime(2026, 11, 11, 0, 53, 56, 916603, tzinfo=Timezone('UTC')) run_id=manual__2026-11-11T00:53:56.916603+00:00
+2026-11-11T00:53:57.107220Z [info     ] Created dag run.               [airflow.models.dagrun] dagrun=<DagRun phase1_sdi_pipeline @ 2026-11-11 00:00:00+00:00: manual__2026-11-11T00:53:56.916603+00:00, state:running, queued_at: None. run_type: manual> loc=dagrun.py:3104
+2026-11-11T00:53:57.237773Z [info     ] [DAG TEST] starting task_id=synthesize_incremental_batches map_index=-1 [airflow.sdk.definitions.dag] loc=dag.py:1540
+2026-11-11T00:53:57.238824Z [info     ] [DAG TEST] running task <TaskInstance: phase1_sdi_pipeline.synthesize_incremental_batches manual__2026-11-11T00:53:56.916603+00:00 [TaskInstanceState.SCHEDULED] ti_id=01a1c818-e4a3-7310-8146-c9fdd7bd7b8d> [airflow.sdk.definitions.dag] loc=dag.py:1543
+2026-11-11T00:54:02.720531Z [info     ] Task started                   [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c818-e834-762b-a011-55119c84fdd2 hostname=020d50599156 loc=task_instances.py:270 previous_state=queued ti_id=01a1c818-e4a3-7310-8146-c9fdd7bd7b8d
+2026-11-11T00:54:02.723926Z [info     ] Task instance state updated    [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c818-e834-762b-a011-55119c84fdd2 loc=task_instances.py:307 rows_affected=1 ti_id=01a1c818-e4a3-7310-8146-c9fdd7bd7b8d
+2026-11-11T00:54:02.771997Z [info     ] Updating RenderedTaskInstanceFields [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c818-fb09-7f1d-9429-ccfe940be29b field_count=3 loc=task_instances.py:1375 ti_id=01a1c818-e4a3-7310-8146-c9fdd7bd7b8d
+2026-11-11T00:54:02.788863Z [info     ] ::endgroup::                   [task] loc=task_runner.py:2400
+=================================================================
+GENERATING INCREMENTAL BATCH(ES)
+=================================================================
+Batch 1 Sales   : 10,000 rows | 2026-01-01 -> 2026-01-30 | margin 20.2% (raw 23.4%) -> incremental_sales_20261111_005411_b1.csv
+Batch 1 Hospital: 756 rows | month 2026-01-01 -> incremental_hosp_20261111_005411_b1.csv
+Batch 2 Sales   : 10,000 rows | 2026-01-31 -> 2026-03-01 | margin 20.2% (raw 23.4%) -> incremental_sales_20261111_005411_b2.csv
+Batch 2 Hospital: 756 rows | month 2026-02-01 -> incremental_hosp_20261111_005411_b2.csv
+2026-11-11T00:54:12.426205Z [info     ] Done. Returned value was: None [airflow.task.operators.airflow.providers.standard.decorators.python._PythonDecoratedOperator] loc=python.py:233
+2026-11-11T00:54:12.426737Z [info     ] ::group::Post Execute          [task] loc=task_runner.py:1674
+2026-11-11T00:54:12.460784Z [info     ] Task instance state updated    [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c819-20cd-7fd2-b41b-4e6f617fbcab loc=task_instances.py:722 new_state=success rows_affected=1 ti_id=01a1c818-e4a3-7310-8146-c9fdd7bd7b8d
+2026-11-11T00:54:12.468593Z [info     ] ::endgroup::                   [task] loc=task_runner.py:2547
+2026-11-11T00:54:12.490033Z [info     ] [DAG TEST] end task task_id=synthesize_incremental_batches map_index=-1 [airflow.sdk.definitions.dag] loc=dag.py:1613
+2026-11-11T00:54:12.504824Z [info     ] [DAG TEST] starting task_id=stage_and_validate_postgres map_index=-1 [airflow.sdk.definitions.dag] loc=dag.py:1540
+2026-11-11T00:54:12.505800Z [info     ] [DAG TEST] running task <TaskInstance: phase1_sdi_pipeline.stage_and_validate_postgres manual__2026-11-11T00:53:56.916603+00:00 [TaskInstanceState.SCHEDULED] ti_id=01a1c818-e4a4-74a4-973f-69bda15b7722> [airflow.sdk.definitions.dag] loc=dag.py:1543
+2026-11-11T00:54:12.522084Z [info     ] Task started                   [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c819-211e-7bf9-834a-679f311aa917 hostname=020d50599156 loc=task_instances.py:270 previous_state=queued ti_id=01a1c818-e4a4-74a4-973f-69bda15b7722
+2026-11-11T00:54:12.524469Z [info     ] Task instance state updated    [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c819-211e-7bf9-834a-679f311aa917 loc=task_instances.py:307 rows_affected=1 ti_id=01a1c818-e4a4-74a4-973f-69bda15b7722
+2026-11-11T00:54:12.554649Z [info     ] Updating RenderedTaskInstanceFields [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c819-2143-7b2a-9e8a-dbba9430a9ab field_count=3 loc=task_instances.py:1375 ti_id=01a1c818-e4a4-74a4-973f-69bda15b7722
+2026-11-11T00:54:12.567545Z [info     ] ::endgroup::                   [task] loc=task_runner.py:2400
+=================================================================
+INGESTION & VALIDATION PIPELINE (RAW + LANDING, INCREMENTAL)
+=================================================================
+Bootstrap: empty registry/staging -> clean full load
+Loaded 01_master_data.csv: 63 valid rows -> staging.stg_master_data
+Loaded 05_pharmacy_sales_data.csv: 500,000 valid rows -> staging.stg_pharmacy_sales
+Loaded incremental_sales_20261111_005411_b1.csv: 10,000 valid rows -> staging.stg_pharmacy_sales
+Loaded incremental_sales_20261111_005411_b2.csv: 10,000 valid rows -> staging.stg_pharmacy_sales
+Loaded 06_hospital_demand_data.csv: 27,216 valid rows -> staging.stg_hospital_demand
+Loaded incremental_hosp_20261111_005411_b1.csv: 756 valid rows -> staging.stg_hospital_demand
+Loaded incremental_hosp_20261111_005411_b2.csv: 756 valid rows -> staging.stg_hospital_demand
+
+Done: 7 new file(s) loaded, 0 skipped.
+  staging.stg_master_data: 63 rows
+  staging.stg_pharmacy_sales: 520,000 rows
+  staging.stg_hospital_demand: 28,728 rows
+2026-11-11T00:54:43.110053Z [info     ] Done. Returned value was: None [airflow.task.operators.airflow.providers.standard.decorators.python._PythonDecoratedOperator] loc=python.py:233
+2026-11-11T00:54:43.135452Z [info     ] ::group::Post Execute          [task] loc=task_runner.py:1674
+2026-11-11T00:54:43.535791Z [info     ] Task instance state updated    [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c819-98f4-7ea0-8b54-e05e5b5a85dd loc=task_instances.py:722 new_state=success rows_affected=1 ti_id=01a1c818-e4a4-74a4-973f-69bda15b7722
+2026-11-11T00:54:43.579434Z [info     ] ::endgroup::                   [task] loc=task_runner.py:2547
+2026-11-11T00:54:43.634266Z [info     ] [DAG TEST] end task task_id=stage_and_validate_postgres map_index=-1 [airflow.sdk.definitions.dag] loc=dag.py:1613
+2026-11-11T00:54:43.681751Z [info     ] [DAG TEST] starting task_id=transform_duckdb_star_schema map_index=-1 [airflow.sdk.definitions.dag] loc=dag.py:1540
+2026-11-11T00:54:43.682464Z [info     ] [DAG TEST] running task <TaskInstance: phase1_sdi_pipeline.transform_duckdb_star_schema manual__2026-11-11T00:53:56.916603+00:00 [TaskInstanceState.SCHEDULED] ti_id=01a1c818-e4a5-71ed-be40-ec9d69dd4182> [airflow.sdk.definitions.dag] loc=dag.py:1543
+2026-11-11T00:54:43.733525Z [info     ] Task started                   [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c819-9aef-7055-8762-f01608759d71 hostname=020d50599156 loc=task_instances.py:270 previous_state=queued ti_id=01a1c818-e4a5-71ed-be40-ec9d69dd4182
+2026-11-11T00:54:43.738751Z [info     ] Task instance state updated    [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c819-9aef-7055-8762-f01608759d71 loc=task_instances.py:307 rows_affected=1 ti_id=01a1c818-e4a5-71ed-be40-ec9d69dd4182
+2026-11-11T00:54:43.832488Z [info     ] Updating RenderedTaskInstanceFields [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c819-9b6d-7bd0-abac-a8ab404380d2 field_count=3 loc=task_instances.py:1375 ti_id=01a1c818-e4a5-71ed-be40-ec9d69dd4182
+2026-11-11T00:54:43.863299Z [info     ] ::endgroup::                   [task] loc=task_runner.py:2400
+=================================================================
+TRANSFORMING STAR SCHEMA (WITH SCD TYPE 2 & REFINED DIMS)
+=================================================================
+2026-11-11T00:54:44.217063Z [warning  ] pandas only supports SQLAlchemy connectable (engine/connection) or database string URI or sqlite3 DBAPI2 connection. Other DBAPI2 objects are not tested. Please consider using SQLAlchemy. [py.warnings] category=UserWarning filename=/opt/airflow/scripts/build_datamart.py lineno=24
+2026-11-11T00:54:44.228393Z [warning  ] pandas only supports SQLAlchemy connectable (engine/connection) or database string URI or sqlite3 DBAPI2 connection. Other DBAPI2 objects are not tested. Please consider using SQLAlchemy. [py.warnings] category=UserWarning filename=/opt/airflow/scripts/build_datamart.py lineno=25
+2026-11-11T00:56:01.550076Z [warning  ] pandas only supports SQLAlchemy connectable (engine/connection) or database string URI or sqlite3 DBAPI2 connection. Other DBAPI2 objects are not tested. Please consider using SQLAlchemy. [py.warnings] category=UserWarning filename=/opt/airflow/scripts/build_datamart.py lineno=26
+    -> Dim_Medicine (SCD Type 2) built.
+    -> Dim_Hospital built.
+    -> Dim_Channel built.
+    -> Dim_Date built.
+    -> Fact_Sales built.
+    -> Fact_HospitalDemand built.
+2026-11-11T00:56:08.390848Z [info     ] Done. Returned value was: None [airflow.task.operators.airflow.providers.standard.decorators.python._PythonDecoratedOperator] loc=python.py:233
+2026-11-11T00:56:08.426352Z [info     ] ::group::Post Execute          [task] loc=task_runner.py:1674
+2026-11-11T00:56:10.587872Z [info     ] Task instance state updated    [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c81a-e69e-7db4-92f4-886a1c8ccf96 loc=task_instances.py:722 new_state=success rows_affected=1 ti_id=01a1c818-e4a5-71ed-be40-ec9d69dd4182
+2026-11-11T00:56:10.799359Z [info     ] ::endgroup::                   [task] loc=task_runner.py:2547
+2026-11-11T00:56:10.988511Z [info     ] [DAG TEST] end task task_id=transform_duckdb_star_schema map_index=-1 [airflow.sdk.definitions.dag] loc=dag.py:1613
+2026-11-11T00:56:11.122548Z [info     ] [DAG TEST] starting task_id=run_analytical_and_storage_queries map_index=-1 [airflow.sdk.definitions.dag] loc=dag.py:1540
+2026-11-11T00:56:11.125270Z [info     ] [DAG TEST] running task <TaskInstance: phase1_sdi_pipeline.run_analytical_and_storage_queries manual__2026-11-11T00:53:56.916603+00:00 [TaskInstanceState.SCHEDULED] ti_id=01a1c818-e4a6-77b4-a0c2-610f6099c7b5> [airflow.sdk.definitions.dag] loc=dag.py:1543
+2026-11-11T00:56:11.284922Z [info     ] Task started                   [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c81a-f0ad-76f9-bee3-8d1660e1e0ab hostname=020d50599156 loc=task_instances.py:270 previous_state=queued ti_id=01a1c818-e4a6-77b4-a0c2-610f6099c7b5
+2026-11-11T00:56:11.299237Z [info     ] Task instance state updated    [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c81a-f0ad-76f9-bee3-8d1660e1e0ab loc=task_instances.py:307 rows_affected=1 ti_id=01a1c818-e4a6-77b4-a0c2-610f6099c7b5
+2026-11-11T00:56:11.632897Z [info     ] Updating RenderedTaskInstanceFields [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c81a-f254-7f2e-8edf-9b4aca91168a field_count=3 loc=task_instances.py:1375 ti_id=01a1c818-e4a6-77b4-a0c2-610f6099c7b5
+2026-11-11T00:56:11.734706Z [info     ] ::endgroup::                   [task] loc=task_runner.py:2400
+=================================================================
+ANALYTICAL EXECUTION BENCHMARKS:
+  * Query 1 (Hospital Fulfillment): 30.45 ms
+  * Query 2 (Channel Revenue):     37.69 ms
+  * Query 3 (Cold Chain Velocity): 15.47 ms
+
+STORAGE METRICS (DuckDB Size: 29.26 MB):
+         table_name  EstimatedRows
+        Dim_Channel              9
+           Dim_Date           1128
+       Dim_Hospital             12
+       Dim_Medicine             64
+Fact_HospitalDemand          28728
+         Fact_Sales         520000
+Query_Execution_Log              6
+=================================================================
+2026-11-11T00:56:12.099257Z [info     ] Done. Returned value was: None [airflow.task.operators.airflow.providers.standard.decorators.python._PythonDecoratedOperator] loc=python.py:233
+2026-11-11T00:56:12.100089Z [info     ] ::group::Post Execute          [task] loc=task_runner.py:1674
+2026-11-11T00:56:12.119885Z [info     ] Task instance state updated    [airflow.api_fastapi.execution_api.routes.task_instances] correlation_id=01a1c81a-f445-7492-b98a-3d9a993b3596 loc=task_instances.py:722 new_state=success rows_affected=1 ti_id=01a1c818-e4a6-77b4-a0c2-610f6099c7b5
+2026-11-11T00:56:12.128896Z [info     ] ::endgroup::                   [task] loc=task_runner.py:2547
+2026-11-11T00:56:12.139931Z [info     ] [DAG TEST] end task task_id=run_analytical_and_storage_queries map_index=-1 [airflow.sdk.definitions.dag] loc=dag.py:1613
+2026-11-11T00:56:12.149306Z [info     ] Marking run <DagRun phase1_sdi_pipeline @ 2026-11-11 00:00:00+00:00: manual__2026-11-11T00:53:56.916603+00:00, state:running, queued_at: None. run_type: manual> successful [airflow.models.dagrun.DagRun] loc=dagrun.py:1381
+2026-11-11T00:56:12.165986Z [info     ] DagRun Finished: dag_id=phase1_sdi_pipeline, logical_date=2026-11-11 00:00:00+00:00, run_id=manual__2026-11-11T00:53:56.916603+00:00, run_start_date=2026-11-11 00:53:57.002575+00:00, run_end_date=2026-11-11 00:56:12.150099+00:00, run_duration=135.147524, state=success, run_type=manual, data_interval_start=2026-11-11 00:00:00+00:00, data_interval_end=2026-11-11 00:00:00+00:00, [airflow.models.dagrun.DagRun] loc=dagrun.py:1449
