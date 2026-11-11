@@ -37,3 +37,4 @@ Or run the scripts manually in order from the project root:
 - **Scripts, Staging & Star Schema:** Working with SCD Type 2 on `Dim_Medicine` and DuckDB analytical queries logging sub-second response times (~13–16 ms).
 - **Orchestration:** Fully functional end-to-end. Both CLI test runs and manual triggers from the Airflow Web UI / Celery worker execute all four tasks sequentially to 100% green `Success` (Run Duration: ~3m 22s).
 - **Upcoming Items:** File-watcher trigger integration and Phase 2 Inventory Mart.
+- ![Airflow DAG Success](docs/airflow_ui_run_success.png)
