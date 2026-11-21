@@ -1,0 +1,416 @@
+{
+ "uid": "de-query-performance",
+ "title": "DE 3 - Analytical Query Performance",
+ "tags": [
+  "pharma",
+  "data-engineering"
+ ],
+ "timezone": "browser",
+ "schemaVersion": 39,
+ "version": 1,
+ "refresh": "10s",
+ "time": {
+  "from": "now-7d",
+  "to": "now"
+ },
+ "editable": true,
+ "panels": [
+  {
+   "id": 22,
+   "type": "stat",
+   "title": "Queries executed",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT COUNT(*) AS queries FROM staging.metrics_query_log"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "blue"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 23,
+   "type": "stat",
+   "title": "Average execution time (ms)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 6,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT ROUND(AVG(execution_time_ms)::numeric, 2) AS avg_ms FROM staging.metrics_query_log"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ms",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "green"
+     },
+     "decimals": 2
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 24,
+   "type": "stat",
+   "title": "Slowest execution (ms)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT ROUND(MAX(execution_time_ms)::numeric, 2) AS max_ms FROM staging.metrics_query_log"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ms",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "orange"
+     },
+     "decimals": 2
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 25,
+   "type": "stat",
+   "title": "Queries today",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 18,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT COUNT(*) AS today FROM staging.metrics_query_log WHERE executed_at::date = CURRENT_DATE"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "purple"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 26,
+   "type": "barchart",
+   "title": "Average execution time per query (ms)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 4,
+    "w": 12,
+    "h": 9
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT query_name, ROUND(AVG(execution_time_ms)::numeric, 2) AS avg_ms FROM staging.metrics_query_log GROUP BY query_name ORDER BY query_name"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ms"
+    },
+    "overrides": []
+   },
+   "options": {
+    "orientation": "vertical",
+    "showValue": "always",
+    "legend": {
+     "showLegend": false
+    },
+    "tooltip": {
+     "mode": "single"
+    },
+    "barWidth": 0.7,
+    "groupWidth": 0.7,
+    "xTickLabelRotation": 0
+   }
+  },
+  {
+   "id": 27,
+   "type": "timeseries",
+   "title": "Daily active query count",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 4,
+    "w": 12,
+    "h": 9
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT date_trunc('day', executed_at) AS time, COUNT(*) AS value FROM staging.metrics_query_log WHERE $__timeFilter(executed_at) GROUP BY 1 ORDER BY 1"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "bars",
+      "lineWidth": 2,
+      "showPoints": "always",
+      "pointSize": 8,
+      "fillOpacity": 30
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom",
+     "showLegend": true
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   }
+  },
+  {
+   "id": 28,
+   "type": "timeseries",
+   "title": "Execution time per query over time (ms)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 13,
+    "w": 24,
+    "h": 8
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT executed_at AS time, query_name AS metric, execution_time_ms AS value FROM staging.metrics_query_log WHERE $__timeFilter(executed_at) ORDER BY 1"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ms",
+     "custom": {
+      "drawStyle": "line",
+      "lineWidth": 2,
+      "showPoints": "always",
+      "pointSize": 8,
+      "fillOpacity": 10
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom",
+     "showLegend": true
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   }
+  },
+  {
+   "id": 29,
+   "type": "table",
+   "title": "Latest 15 query executions",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 21,
+    "w": 24,
+    "h": 8
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT query_name, execution_time_ms, rows_returned, executed_at FROM staging.metrics_query_log ORDER BY executed_at DESC LIMIT 15"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   }
+  }
+ ],
+ "templating": {
+  "list": []
+ },
+ "annotations": {
+  "list": []
+ }
+}

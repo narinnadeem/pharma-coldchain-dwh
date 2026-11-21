@@ -1,0 +1,513 @@
+{
+ "uid": "de-storage",
+ "title": "DE 2 - Storage and Data Coverage",
+ "tags": [
+  "pharma",
+  "data-engineering"
+ ],
+ "timezone": "browser",
+ "schemaVersion": 39,
+ "version": 1,
+ "refresh": "10s",
+ "time": {
+  "from": "now-7d",
+  "to": "now"
+ },
+ "editable": true,
+ "panels": [
+  {
+   "id": 12,
+   "type": "stat",
+   "title": "Staging rows (Postgres)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT COALESCE(SUM(row_count), 0) AS rows FROM staging.metrics_storage WHERE layer = 'staging' AND table_name <> 'stg_rejected_records' AND snapshot_ts = (SELECT MAX(snapshot_ts) FROM staging.metrics_storage)"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "blue"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 13,
+   "type": "stat",
+   "title": "Data mart rows (DuckDB, excl. log)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 6,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT COALESCE(SUM(row_count), 0) AS rows FROM staging.metrics_storage WHERE layer = 'mart' AND table_name <> 'Query_Execution_Log' AND snapshot_ts = (SELECT MAX(snapshot_ts) FROM staging.metrics_storage)"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "purple"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 14,
+   "type": "stat",
+   "title": "Postgres staging DB size (MB)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT size_mb FROM staging.metrics_footprint WHERE component = 'postgres_staging_db' ORDER BY snapshot_ts DESC LIMIT 1"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "decmbytes",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "green"
+     },
+     "decimals": 1
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 15,
+   "type": "stat",
+   "title": "DuckDB mart file size (MB)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 18,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT size_mb FROM staging.metrics_footprint WHERE component = 'duckdb_mart_file' ORDER BY snapshot_ts DESC LIMIT 1"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "decmbytes",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "orange"
+     },
+     "decimals": 1
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 16,
+   "type": "piechart",
+   "title": "Storage breakdown by source domain (staging rows)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 4,
+    "w": 10,
+    "h": 9
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT table_name, row_count FROM staging.metrics_storage WHERE layer = 'staging' AND table_name <> 'stg_rejected_records' AND snapshot_ts = (SELECT MAX(snapshot_ts) FROM staging.metrics_storage) ORDER BY row_count DESC"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {
+    "pieType": "donut",
+    "displayLabels": [
+     "percent"
+    ],
+    "tooltip": {
+     "mode": "single"
+    },
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "showLegend": true,
+     "values": [
+      "value",
+      "percent"
+     ]
+    },
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/^row_count$/",
+     "values": true
+    }
+   }
+  },
+  {
+   "id": 17,
+   "type": "table",
+   "title": "Date coverage (latest snapshot)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 10,
+    "y": 4,
+    "w": 14,
+    "h": 9
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT layer, table_name, date_column, min_date::text AS min_date, max_date::text AS max_date, span_days, year_months AS distinct_year_months FROM staging.metrics_date_coverage WHERE snapshot_ts = (SELECT MAX(snapshot_ts) FROM staging.metrics_date_coverage) ORDER BY layer, table_name"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   }
+  },
+  {
+   "id": 18,
+   "type": "timeseries",
+   "title": "Row count growth per refresh - staging",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 13,
+    "w": 12,
+    "h": 8
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT snapshot_ts AS time, table_name AS metric, row_count AS value FROM staging.metrics_storage WHERE layer = 'staging' AND table_name <> 'stg_rejected_records' AND $__timeFilter(snapshot_ts) ORDER BY 1"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "line",
+      "lineWidth": 2,
+      "showPoints": "always",
+      "pointSize": 8,
+      "fillOpacity": 10
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom",
+     "showLegend": true
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   }
+  },
+  {
+   "id": 19,
+   "type": "timeseries",
+   "title": "Row count growth per refresh - fact tables",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 13,
+    "w": 12,
+    "h": 8
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT snapshot_ts AS time, table_name AS metric, row_count AS value FROM staging.metrics_storage WHERE layer = 'mart' AND table_name LIKE 'Fact%' AND $__timeFilter(snapshot_ts) ORDER BY 1"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "line",
+      "lineWidth": 2,
+      "showPoints": "always",
+      "pointSize": 8,
+      "fillOpacity": 10
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom",
+     "showLegend": true
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   }
+  },
+  {
+   "id": 20,
+   "type": "timeseries",
+   "title": "Storage footprint over time (MB)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 21,
+    "w": 12,
+    "h": 8
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT snapshot_ts AS time, component AS metric, size_mb AS value FROM staging.metrics_footprint WHERE $__timeFilter(snapshot_ts) ORDER BY 1"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "decmbytes",
+     "custom": {
+      "drawStyle": "line",
+      "lineWidth": 2,
+      "showPoints": "always",
+      "pointSize": 8,
+      "fillOpacity": 10
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom",
+     "showLegend": true
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   }
+  },
+  {
+   "id": 21,
+   "type": "table",
+   "title": "Data mart table row counts (latest snapshot)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 21,
+    "w": 12,
+    "h": 8
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT table_name, row_count FROM staging.metrics_storage WHERE layer = 'mart' AND snapshot_ts = (SELECT MAX(snapshot_ts) FROM staging.metrics_storage) ORDER BY row_count DESC"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   }
+  }
+ ],
+ "templating": {
+  "list": []
+ },
+ "annotations": {
+  "list": []
+ }
+}

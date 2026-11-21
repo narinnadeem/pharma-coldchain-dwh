@@ -1,27 +1,34 @@
-import sys
-import os
-from datetime import datetime, timedelta
-from airflow.decorators import dag, task
+"""Phase 1 SDI pipeline (Airflow 3).
 
-# Set path for direct script imports inside the container
+generate -> ingest + validate -> star schema -> analytical queries -> collect DE metrics
+Each task only calls one function from scripts/, so the DAG file stays a thin orchestration layer.
+"""
+import os
+import sys
+from datetime import datetime, timedelta
+
+from airflow.sdk import dag, task
+
 AIRFLOW_HOME = os.getenv("AIRFLOW_HOME", "/opt/airflow")
 if AIRFLOW_HOME not in sys.path:
     sys.path.append(AIRFLOW_HOME)
 
 default_args = {
-    'owner': 'data_engineering',
-    'retries': 1,
-    'retry_delay': timedelta(minutes=1),
+    "owner": "data_engineering",
+    "retries": 1,
+    "retry_delay": timedelta(minutes=1),
 }
 
+
 @dag(
-    dag_id='phase1_sdi_pipeline',
+    dag_id="phase1_sdi_pipeline",
     default_args=default_args,
-    description='End-to-End Pharma Cold Chain SDI Pipeline',
+    description="End-to-end Pharma Cold Chain SDI pipeline (Phase 1)",
     schedule=None,
     start_date=datetime(2026, 1, 1),
     catchup=False,
-    tags=['pharma', 'coldchain', 'milestone1']
+    max_active_runs=1,
+    tags=["pharma", "coldchain", "milestone1"],
 )
 def phase1_sdi_pipeline():
 
@@ -45,11 +52,16 @@ def phase1_sdi_pipeline():
         from scripts.run_queries import run_analytical_layer
         run_analytical_layer()
 
-    t1 = synthesize_incremental_batches()
-    t2 = stage_and_validate_postgres()
-    t3 = transform_duckdb_star_schema()
-    t4 = run_analytical_and_storage_queries()
+    @task
+    def collect_pipeline_metrics():
+        from scripts.collect_metrics import collect_all
+        collect_all()
 
-    t1 >> t2 >> t3 >> t4
+    (synthesize_incremental_batches()
+     >> stage_and_validate_postgres()
+     >> transform_duckdb_star_schema()
+     >> run_analytical_and_storage_queries()
+     >> collect_pipeline_metrics())
+
 
 phase1_sdi_pipeline()

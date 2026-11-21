@@ -1,0 +1,565 @@
+{
+ "uid": "de-batch-ingestion",
+ "title": "DE 1 - Batch Ingestion Monitoring",
+ "tags": [
+  "pharma",
+  "data-engineering"
+ ],
+ "timezone": "browser",
+ "schemaVersion": 39,
+ "version": 1,
+ "refresh": "10s",
+ "time": {
+  "from": "now-7d",
+  "to": "now"
+ },
+ "editable": true,
+ "panels": [
+  {
+   "id": 1,
+   "type": "stat",
+   "title": "Batch success rate (%)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT ROUND(100.0 * COUNT(*) FILTER (WHERE status = 'SUCCESS') / NULLIF(COUNT(*), 0), 1) AS success_rate_pct FROM staging.pipeline_metrics_batch"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percent",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "green"
+     },
+     "decimals": 1
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 2,
+   "type": "stat",
+   "title": "Batches (files) loaded",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 4,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT COUNT(*) AS batches FROM staging.pipeline_metrics_batch"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "blue"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 3,
+   "type": "stat",
+   "title": "Failed batches",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 8,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT COUNT(*) FILTER (WHERE status <> 'SUCCESS') AS failed FROM staging.pipeline_metrics_batch"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "red"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 4,
+   "type": "stat",
+   "title": "Total rows loaded",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT COALESCE(SUM(rows_processed), 0) AS rows_loaded FROM staging.pipeline_metrics_batch WHERE status = 'SUCCESS'"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "purple"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 5,
+   "type": "stat",
+   "title": "Rows rejected by validation",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 16,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT COUNT(*) AS rejected FROM staging.stg_rejected_records"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "orange"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 6,
+   "type": "stat",
+   "title": "Slowest load (s)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 20,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT MAX(duration_seconds) AS slowest_s FROM staging.pipeline_metrics_batch WHERE status = 'SUCCESS'"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "blue"
+     },
+     "decimals": 2
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "orientation": "auto"
+   }
+  },
+  {
+   "id": 7,
+   "type": "barchart",
+   "title": "Batch load duration per file (seconds, latest load)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 4,
+    "w": 12,
+    "h": 9
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT source_file, duration_seconds FROM (SELECT DISTINCT ON (source_file) source_file, duration_seconds, rows_processed, created_at FROM staging.pipeline_metrics_batch WHERE status = 'SUCCESS' ORDER BY source_file, created_at DESC) t ORDER BY duration_seconds DESC"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s"
+    },
+    "overrides": []
+   },
+   "options": {
+    "orientation": "horizontal",
+    "showValue": "always",
+    "legend": {
+     "showLegend": false
+    },
+    "tooltip": {
+     "mode": "single"
+    },
+    "barWidth": 0.7,
+    "groupWidth": 0.7,
+    "xTickLabelRotation": 0
+   }
+  },
+  {
+   "id": 8,
+   "type": "barchart",
+   "title": "Rows processed per file (latest load)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 4,
+    "w": 12,
+    "h": 9
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT source_file, rows_processed FROM (SELECT DISTINCT ON (source_file) source_file, duration_seconds, rows_processed, created_at FROM staging.pipeline_metrics_batch WHERE status = 'SUCCESS' ORDER BY source_file, created_at DESC) t ORDER BY rows_processed DESC"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "options": {
+    "orientation": "horizontal",
+    "showValue": "always",
+    "legend": {
+     "showLegend": false
+    },
+    "tooltip": {
+     "mode": "single"
+    },
+    "barWidth": 0.7,
+    "groupWidth": 0.7,
+    "xTickLabelRotation": 0
+   }
+  },
+  {
+   "id": 9,
+   "type": "timeseries",
+   "title": "Load duration over time (each point = one file load)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 13,
+    "w": 12,
+    "h": 8
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT created_at AS time, source_file AS metric, duration_seconds AS value FROM staging.pipeline_metrics_batch WHERE $__timeFilter(created_at) ORDER BY 1"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s",
+     "custom": {
+      "drawStyle": "line",
+      "lineWidth": 2,
+      "showPoints": "always",
+      "pointSize": 8,
+      "fillOpacity": 10
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom",
+     "showLegend": true
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   }
+  },
+  {
+   "id": 10,
+   "type": "timeseries",
+   "title": "Rows processed over time",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 13,
+    "w": 12,
+    "h": 8
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT created_at AS time, source_file AS metric, rows_processed AS value FROM staging.pipeline_metrics_batch WHERE $__timeFilter(created_at) ORDER BY 1"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "line",
+      "lineWidth": 2,
+      "showPoints": "always",
+      "pointSize": 8,
+      "fillOpacity": 10
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom",
+     "showLegend": true
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   }
+  },
+  {
+   "id": 11,
+   "type": "table",
+   "title": "Latest 15 batch loads",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 21,
+    "w": 24,
+    "h": 8
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT source_file, rows_processed, duration_seconds, status, error_message, created_at FROM staging.pipeline_metrics_batch ORDER BY created_at DESC LIMIT 15"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   }
+  }
+ ],
+ "templating": {
+  "list": []
+ },
+ "annotations": {
+  "list": []
+ }
+}

@@ -1,0 +1,17 @@
+apiVersion: 1
+datasources:
+  - name: Warehouse Postgres
+    uid: warehouse-pg
+    type: grafana-postgresql-datasource
+    access: proxy
+    url: warehouse-db:5432
+    user: dwh
+    database: staging
+    isDefault: true
+    jsonData:
+      database: staging
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
+    secureJsonData:
+      password: dwh123
