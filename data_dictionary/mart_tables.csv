@@ -1,81 +1,81 @@
 table,rows,column,type,description
-Dim_Channel,9,ChannelKey,BIGINT,
-Dim_Channel,9,saleschannel,VARCHAR,
-Dim_Channel,9,pharmacytype,VARCHAR,
-Dim_Date,1308,DateKey,INTEGER,
-Dim_Date,1308,FullDate,DATE,
-Dim_Date,1308,Year,BIGINT,
-Dim_Date,1308,Quarter,BIGINT,
-Dim_Date,1308,Month,BIGINT,
-Dim_Date,1308,MonthName,VARCHAR,
-Dim_Date,1308,Day,BIGINT,
-Dim_Date,1308,DayName,VARCHAR,
-Dim_Hospital,12,hospitalid,VARCHAR,
-Dim_Hospital,12,hospitalgln,VARCHAR,
-Dim_Hospital,12,hospitalname,VARCHAR,
-Dim_Hospital,12,hospitaltype,VARCHAR,
-Dim_Hospital,12,city,VARCHAR,
-Dim_Hospital,12,state,VARCHAR,
-Dim_Hospital,12,countrycode,VARCHAR,
-Dim_Hospital,12,licensedbeds,BIGINT,
-Dim_Hospital,12,icubeds,BIGINT,
-Dim_Hospital,12,traumalevel,VARCHAR,
-Dim_Hospital,12,catchmentpopulation,BIGINT,
-Dim_Medicine,64,MedicineSK,BIGINT,
-Dim_Medicine,64,medicineid,VARCHAR,
-Dim_Medicine,64,internalsku,VARCHAR,
-Dim_Medicine,64,gtin14,VARCHAR,
-Dim_Medicine,64,genericname,VARCHAR,
-Dim_Medicine,64,fictionalbrandname,VARCHAR,
-Dim_Medicine,64,diseasecategory,VARCHAR,
-Dim_Medicine,64,therapeuticclass,VARCHAR,
-Dim_Medicine,64,dosageform,VARCHAR,
-Dim_Medicine,64,strength,VARCHAR,
-Dim_Medicine,64,coldchainflag,VARCHAR,
-Dim_Medicine,64,storagemintempc,DOUBLE,
-Dim_Medicine,64,storagemaxtempc,DOUBLE,
-Dim_Medicine,64,unitmanufacturingcostusd,DOUBLE,
-Dim_Medicine,64,wholesalepriceusd,DOUBLE,
-Dim_Medicine,64,recommendedretailpriceusd,DOUBLE,
-Dim_Medicine,64,RowEffectiveDate,DATE,
-Dim_Medicine,64,RowExpiryDate,DATE,
-Dim_Medicine,64,IsCurrent,BOOLEAN,
-Fact_HospitalDemand,33264,hospitaldemandrecordid,VARCHAR,
-Fact_HospitalDemand,33264,DateKey,INTEGER,
-Fact_HospitalDemand,33264,hospitalid,VARCHAR,
-Fact_HospitalDemand,33264,MedicineSK,BIGINT,
-Fact_HospitalDemand,33264,medicineid,VARCHAR,
-Fact_HospitalDemand,33264,forecastdemandpacks,BIGINT,
-Fact_HospitalDemand,33264,requestedquantitypacks,BIGINT,
-Fact_HospitalDemand,33264,approvedquantitypacks,BIGINT,
-Fact_HospitalDemand,33264,receivedquantitypacks,BIGINT,
-Fact_HospitalDemand,33264,consumedquantitypacks,BIGINT,
-Fact_HospitalDemand,33264,unfulfilleddemandpacks,BIGINT,
-Fact_HospitalDemand,33264,stockoutdays,BIGINT,
-Fact_HospitalDemand,33264,servicelevelpct,DOUBLE,
-Fact_Sales,580000,salestransactionid,VARCHAR,
-Fact_Sales,580000,DateKey,INTEGER,
-Fact_Sales,580000,MedicineSK,BIGINT,
-Fact_Sales,580000,medicineid,VARCHAR,
-Fact_Sales,580000,hospitalid,VARCHAR,
-Fact_Sales,580000,ChannelKey,BIGINT,
-Fact_Sales,580000,pharmacyid,VARCHAR,
-Fact_Sales,580000,quantitysoldpacks,BIGINT,
-Fact_Sales,580000,unitretailpriceusd,DOUBLE,
-Fact_Sales,580000,grosssalesamountusd,DOUBLE,
-Fact_Sales,580000,discountamountusd,DOUBLE,
-Fact_Sales,580000,netsalesamountusd,DOUBLE,
-Fact_Sales,580000,costofgoodssoldusd,DOUBLE,
-Fact_Sales,580000,grossmarginusd,DOUBLE,
-Query_Execution_Log,15,log_id,INTEGER,
-Query_Execution_Log,15,query_name,VARCHAR,
-Query_Execution_Log,15,execution_time_ms,DOUBLE,
-Query_Execution_Log,15,rows_returned,BIGINT,
-Query_Execution_Log,15,executed_at,TIMESTAMP,
-Summary_Hospital_Fulfillment,12,hospitalname,VARCHAR,
-Summary_Hospital_Fulfillment,12,hospitaltype,VARCHAR,
-Summary_Hospital_Fulfillment,12,TotalForecastPacks,HUGEINT,
-Summary_Hospital_Fulfillment,12,TotalConsumedPacks,HUGEINT,
-Summary_Hospital_Fulfillment,12,ConsumptionVsForecastPct,DOUBLE,
-Summary_Hospital_Fulfillment,12,TotalUnfulfilledPacks,HUGEINT,
-Summary_Hospital_Fulfillment,12,AvgServiceLevelPct,DOUBLE,
+Dim_Channel,9,ChannelKey,BIGINT,Surrogate key of the sales channel (primary key)
+Dim_Channel,9,saleschannel,VARCHAR,Sales channel: Physical Pharmacy or Ecommerce
+Dim_Channel,9,pharmacytype,VARCHAR,"Type of pharmacy (chain, independent or hospital pharmacy)"
+Dim_Date,1308,DateKey,INTEGER,Date key in YYYYMMDD format (primary key)
+Dim_Date,1308,FullDate,DATE,Calendar date
+Dim_Date,1308,Year,BIGINT,Calendar year
+Dim_Date,1308,Quarter,BIGINT,Calendar quarter (1 to 4)
+Dim_Date,1308,Month,BIGINT,Month number (1 to 12)
+Dim_Date,1308,MonthName,VARCHAR,Month name
+Dim_Date,1308,Day,BIGINT,Day of the month
+Dim_Date,1308,DayName,VARCHAR,Day of the week name
+Dim_Hospital,12,hospitalid,VARCHAR,Hospital identifier (primary key)
+Dim_Hospital,12,hospitalgln,VARCHAR,GS1 Global Location Number of the hospital
+Dim_Hospital,12,hospitalname,VARCHAR,Name of the hospital
+Dim_Hospital,12,hospitaltype,VARCHAR,Type of hospital
+Dim_Hospital,12,city,VARCHAR,City of the hospital
+Dim_Hospital,12,state,VARCHAR,State of the hospital
+Dim_Hospital,12,countrycode,VARCHAR,ISO country code
+Dim_Hospital,12,licensedbeds,BIGINT,Number of licensed beds
+Dim_Hospital,12,icubeds,BIGINT,Number of intensive care beds
+Dim_Hospital,12,traumalevel,VARCHAR,Trauma centre level; blank if none
+Dim_Hospital,12,catchmentpopulation,BIGINT,Population served by the hospital
+Dim_Medicine,64,MedicineSK,BIGINT,"Surrogate key of the medicine version (primary key, SCD Type 2)"
+Dim_Medicine,64,medicineid,VARCHAR,Business identifier of the medicine
+Dim_Medicine,64,internalsku,VARCHAR,Internal stock keeping unit code
+Dim_Medicine,64,gtin14,VARCHAR,14-digit GS1 Global Trade Item Number
+Dim_Medicine,64,genericname,VARCHAR,Generic drug name
+Dim_Medicine,64,fictionalbrandname,VARCHAR,Fictional brand name
+Dim_Medicine,64,diseasecategory,VARCHAR,Disease area the medicine is used for
+Dim_Medicine,64,therapeuticclass,VARCHAR,Therapeutic drug class
+Dim_Medicine,64,dosageform,VARCHAR,Pharmaceutical form of the medicine
+Dim_Medicine,64,strength,VARCHAR,Dose strength per unit
+Dim_Medicine,64,coldchainflag,VARCHAR,Y/N: needs cold-chain storage
+Dim_Medicine,64,storagemintempc,DOUBLE,Minimum storage temperature in degrees Celsius
+Dim_Medicine,64,storagemaxtempc,DOUBLE,Maximum storage temperature in degrees Celsius
+Dim_Medicine,64,unitmanufacturingcostusd,DOUBLE,Manufacturing cost per pack in US dollars
+Dim_Medicine,64,wholesalepriceusd,DOUBLE,Wholesale price per pack in US dollars
+Dim_Medicine,64,recommendedretailpriceusd,DOUBLE,Recommended retail price per pack in US dollars
+Dim_Medicine,64,RowEffectiveDate,DATE,SCD Type 2: date this version became valid
+Dim_Medicine,64,RowExpiryDate,DATE,SCD Type 2: date this version stopped being valid
+Dim_Medicine,64,IsCurrent,BOOLEAN,SCD Type 2: true for the current version of the medicine
+Fact_HospitalDemand,33264,hospitaldemandrecordid,VARCHAR,Hospital demand record identifier (grain of the fact)
+Fact_HospitalDemand,33264,DateKey,INTEGER,Foreign key to Dim_Date (demand month)
+Fact_HospitalDemand,33264,hospitalid,VARCHAR,Foreign key to Dim_Hospital
+Fact_HospitalDemand,33264,MedicineSK,BIGINT,Foreign key to Dim_Medicine (version valid at that time)
+Fact_HospitalDemand,33264,medicineid,VARCHAR,Business identifier of the medicine
+Fact_HospitalDemand,33264,forecastdemandpacks,BIGINT,Forecast demand in packs
+Fact_HospitalDemand,33264,requestedquantitypacks,BIGINT,Packs requested by the hospital
+Fact_HospitalDemand,33264,approvedquantitypacks,BIGINT,Packs approved for supply
+Fact_HospitalDemand,33264,receivedquantitypacks,BIGINT,Packs received by the hospital
+Fact_HospitalDemand,33264,consumedquantitypacks,BIGINT,Packs consumed in the month
+Fact_HospitalDemand,33264,unfulfilleddemandpacks,BIGINT,Demand in packs that could not be fulfilled
+Fact_HospitalDemand,33264,stockoutdays,BIGINT,Days the medicine was out of stock
+Fact_HospitalDemand,33264,servicelevelpct,DOUBLE,"Share of demand fulfilled, in percent"
+Fact_Sales,580000,salestransactionid,VARCHAR,Sales transaction identifier (grain of the fact)
+Fact_Sales,580000,DateKey,INTEGER,Foreign key to Dim_Date (sale date)
+Fact_Sales,580000,MedicineSK,BIGINT,Foreign key to Dim_Medicine (version valid at sale)
+Fact_Sales,580000,medicineid,VARCHAR,Business identifier of the medicine
+Fact_Sales,580000,hospitalid,VARCHAR,Linked hospital; blank if not hospital-linked
+Fact_Sales,580000,ChannelKey,BIGINT,Foreign key to Dim_Channel
+Fact_Sales,580000,pharmacyid,VARCHAR,Identifier of the selling pharmacy
+Fact_Sales,580000,quantitysoldpacks,BIGINT,Packs sold
+Fact_Sales,580000,unitretailpriceusd,DOUBLE,Retail price per pack in US dollars
+Fact_Sales,580000,grosssalesamountusd,DOUBLE,Sales amount before discount in US dollars
+Fact_Sales,580000,discountamountusd,DOUBLE,Discount in US dollars
+Fact_Sales,580000,netsalesamountusd,DOUBLE,Sales amount after discount in US dollars
+Fact_Sales,580000,costofgoodssoldusd,DOUBLE,Cost of goods sold in US dollars
+Fact_Sales,580000,grossmarginusd,DOUBLE,Net sales minus cost of goods sold in US dollars
+Query_Execution_Log,15,log_id,INTEGER,Running identifier of the log row
+Query_Execution_Log,15,query_name,VARCHAR,Name of the analytical query that was run
+Query_Execution_Log,15,execution_time_ms,DOUBLE,Query run time in milliseconds
+Query_Execution_Log,15,rows_returned,BIGINT,Number of rows the query returned
+Query_Execution_Log,15,executed_at,TIMESTAMP,Timestamp when the query ran
+Summary_Hospital_Fulfillment,12,hospitalname,VARCHAR,Name of the hospital
+Summary_Hospital_Fulfillment,12,hospitaltype,VARCHAR,Type of hospital
+Summary_Hospital_Fulfillment,12,TotalForecastPacks,HUGEINT,Total forecast demand in packs
+Summary_Hospital_Fulfillment,12,TotalConsumedPacks,HUGEINT,Total packs consumed
+Summary_Hospital_Fulfillment,12,ConsumptionVsForecastPct,DOUBLE,Consumed packs as a percentage of forecast
+Summary_Hospital_Fulfillment,12,TotalUnfulfilledPacks,HUGEINT,Total unfulfilled demand in packs
+Summary_Hospital_Fulfillment,12,AvgServiceLevelPct,DOUBLE,Average service level in percent
