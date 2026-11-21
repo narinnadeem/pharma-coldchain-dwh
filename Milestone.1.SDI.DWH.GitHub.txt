@@ -1,8 +1,7 @@
 Group GitHub link (Intelligent Data Architectures - Fall 2026 - Project Phase 1, Milestone 1)
 
 Repository: https://github.com/narinnadeem/pharma-coldchain-dwh
-Profile:    https://github.com/narinnadeem
 
-Group members (also shown on the repository README):
+Group members:
 1. Narin Nadeem - 29167
 2. Ayesha Salahuddin - 29157
