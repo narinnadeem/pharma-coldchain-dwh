@@ -6,7 +6,7 @@ Course project for **Intelligent Data Architectures** (Fall 2026). Phase 1 build
 | Name | Roll no. | GitHub |
 |------|----------|--------|
 | Narin Nadeem | 29167 | [narinnadeem](https://github.com/narinnadeem) |
-| Ayesha Salahuddin | 29157 | - |
+| Ayesha Salahuddin | 29157 | [ayeshasalahuddin](https://github.com/ayeshasalahuddin) |
 
 ## Milestone 1 deliverables
 | Deliverable | Location |
