@@ -1,0 +1,1008 @@
+{
+ "uid": "bi-hospital",
+ "title": "BI 1 - Hospital Forecast vs Actual and Unfulfilled Demand",
+ "description": "Supply planner view: forecast vs consumption and unfulfilled demand",
+ "tags": [
+  "pharma",
+  "bi"
+ ],
+ "timezone": "browser",
+ "schemaVersion": 39,
+ "version": 4,
+ "refresh": "10s",
+ "time": {
+  "from": "2022-12-01T00:00:00.000Z",
+  "to": "now+1y"
+ },
+ "editable": true,
+ "graphTooltip": 1,
+ "panels": [
+  {
+   "id": 101,
+   "type": "text",
+   "title": "Purpose & Decision",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {
+    "mode": "markdown",
+    "content": "**Q:** Are hospitals consuming forecasted stock, and where is unfulfilled demand concentrated?  \n**Action:** Prioritize replenishment for hospitals and medicines exceeding the 2.5% unfulfilled threshold."
+   }
+  },
+  {
+   "id": 102,
+   "type": "stat",
+   "title": "Key Takeaway (Auto-Updated on Refresh)",
+   "description": "",
+   "gridPos": {
+    "x": 7,
+    "y": 0,
+    "w": 11,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#1E3A8A"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/.*/",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto",
+    "text": {
+     "valueSize": 14
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT 'Hospitals consumed ' || ROUND(k.consumption_ratio_pct,1) || '% of forecast (' || CASE WHEN k.consumption_ratio_pct >= 95.0 THEN 'on target' ELSE 'below 95% target' END || '); ' || ROUND(k.unfulfilled_pct,2) || '% went unfulfilled (' || CASE WHEN k.unfulfilled_pct <= 2.5 THEN 'within' ELSE 'above' END || ' 2.5% limit). Largest gap: ' || t.hospital_name || ' (' || TO_CHAR(t.u, 'FM999,999') || ' packs).' AS takeaway FROM (SELECT * FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1) k, (SELECT hospital_name, SUM(unfulfilled_packs) AS u FROM bi.hospital_monthly GROUP BY 1 ORDER BY 2 DESC LIMIT 1) t"
+    }
+   ]
+  },
+  {
+   "id": 103,
+   "type": "stat",
+   "title": "Pipeline Refresh Status",
+   "description": "",
+   "gridPos": {
+    "x": 18,
+    "y": 0,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#0F766E"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/.*/",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto",
+    "text": {
+     "valueSize": 14
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT 'Refresh #' || refresh_no || ' | ' || to_char(refreshed_at, 'YYYY-MM-DD HH24:MI') || ' UTC | Data to ' || to_char(GREATEST(sales_data_to, hospital_data_to), 'YYYY-MM-DD') AS refreshed FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1"
+    }
+   ]
+  },
+  {
+   "id": 104,
+   "type": "stat",
+   "title": "Consumption Ratio (Target >= 95%)",
+   "description": "Consumed packs / forecast packs x 100 | Grain: Percent; hospital x medicine x month, summed | Target: >= 95% (assumed) | Exclusions: Rows with null IDs or negative consumption are rejected at staging",
+   "gridPos": {
+    "x": 0,
+    "y": 3,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percent",
+     "decimals": 1,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "#B91C1C",
+        "value": null
+       },
+       {
+        "color": "#15803D",
+        "value": 95.0
+       }
+      ]
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "vs Prev Refresh"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "percent"
+       },
+       {
+        "id": "decimals",
+        "value": 1
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#1E293B"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "orientation": "horizontal",
+    "justifyMode": "center",
+    "text": {
+     "valueSize": 28,
+     "titleSize": 12
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT consumption_ratio_pct AS \"Now\", consumption_ratio_pct - LAG(consumption_ratio_pct) OVER (ORDER BY refresh_no) AS \"vs Prev Refresh\" FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1"
+    }
+   ]
+  },
+  {
+   "id": 105,
+   "type": "stat",
+   "title": "Unfulfilled Share (Limit <= 2.5%)",
+   "description": "Unfulfilled packs / forecast packs x 100 | Grain: Percent; hospital x medicine x month, summed | Target: <= 2.5% (assumed) | Exclusions: Same as above",
+   "gridPos": {
+    "x": 6,
+    "y": 3,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percent",
+     "decimals": 2,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "#15803D",
+        "value": null
+       },
+       {
+        "color": "#B91C1C",
+        "value": 2.51
+       }
+      ]
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "vs Prev Refresh"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "percent"
+       },
+       {
+        "id": "decimals",
+        "value": 2
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#1E293B"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "orientation": "horizontal",
+    "justifyMode": "center",
+    "text": {
+     "valueSize": 28,
+     "titleSize": 12
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT unfulfilled_pct AS \"Now\", unfulfilled_pct - LAG(unfulfilled_pct) OVER (ORDER BY refresh_no) AS \"vs Prev Refresh\" FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1"
+    }
+   ]
+  },
+  {
+   "id": 106,
+   "type": "stat",
+   "title": "Total Unfulfilled Demand (Packs)",
+   "description": "",
+   "gridPos": {
+    "x": 12,
+    "y": 3,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "decimals": 0,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#B45309"
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "vs Prev Refresh"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "short"
+       },
+       {
+        "id": "decimals",
+        "value": 0
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#1E293B"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "orientation": "horizontal",
+    "justifyMode": "center",
+    "text": {
+     "valueSize": 28,
+     "titleSize": 12
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT unfulfilled_packs AS \"Now\", unfulfilled_packs - LAG(unfulfilled_packs) OVER (ORDER BY refresh_no) AS \"vs Prev Refresh\" FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1"
+    }
+   ]
+  },
+  {
+   "id": 107,
+   "type": "stat",
+   "title": "Hospitals Above 2.5% Unfulfilled Limit",
+   "description": "",
+   "gridPos": {
+    "x": 18,
+    "y": 3,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#991B1B"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/.*/",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto",
+    "text": {
+     "valueSize": 24
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT COUNT(*) FILTER (WHERE pct > 2.5) || ' of ' || COUNT(*) || ' Hospitals' AS above FROM (SELECT hospital_name, MAX(hospital_type) AS hospital_type, SUM(forecast_packs) AS f, SUM(consumed_packs) AS c, SUM(unfulfilled_packs) AS u, ROUND(SUM(unfulfilled_packs)*100.0/NULLIF(SUM(forecast_packs),0),2) AS pct, ROUND(AVG(avg_service_level_pct),1) AS sl FROM bi.hospital_monthly GROUP BY 1) x"
+    }
+   ]
+  },
+  {
+   "id": 108,
+   "type": "timeseries",
+   "title": "Monthly Forecast vs Actual Consumption (Packs)",
+   "description": "Dashed = forecast demand; solid blue = actual hospital consumption.",
+   "gridPos": {
+    "x": 0,
+    "y": 6,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "line",
+      "lineInterpolation": "smooth",
+      "lineWidth": 2.5,
+      "showPoints": "never",
+      "pointSize": 4,
+      "fillOpacity": 16,
+      "gradientMode": "opacity",
+      "axisLabel": "Packs / Month"
+     },
+     "min": 0
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Forecast"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#64748B"
+        }
+       },
+       {
+        "id": "custom.lineStyle",
+        "value": {
+         "fill": "dash",
+         "dash": [
+          8,
+          6
+         ]
+        }
+       },
+       {
+        "id": "custom.fillOpacity",
+        "value": 0
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Consumed (Actual)"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#2563EB"
+        }
+       },
+       {
+        "id": "custom.fillOpacity",
+        "value": 18
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom",
+     "showLegend": true
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT month::timestamp AS time, SUM(forecast_packs) AS \"Forecast\", SUM(consumed_packs) AS \"Consumed (Actual)\" FROM bi.hospital_monthly GROUP BY 1 ORDER BY 1"
+    }
+   ]
+  },
+  {
+   "id": 109,
+   "type": "timeseries",
+   "title": "Monthly Unfulfilled Demand Share vs 2.5% Limit",
+   "description": "",
+   "gridPos": {
+    "x": 12,
+    "y": 6,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percent",
+     "custom": {
+      "drawStyle": "line",
+      "lineInterpolation": "smooth",
+      "lineWidth": 2.5,
+      "showPoints": "never",
+      "pointSize": 4,
+      "fillOpacity": 16,
+      "gradientMode": "opacity",
+      "axisLabel": "% of Forecast"
+     },
+     "min": 0
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Unfulfilled Share (%)"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#EA580C"
+        }
+       },
+       {
+        "id": "custom.fillOpacity",
+        "value": 20
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Assumed Limit (2.5%)"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#DC2626"
+        }
+       },
+       {
+        "id": "custom.lineStyle",
+        "value": {
+         "fill": "dash",
+         "dash": [
+          8,
+          6
+         ]
+        }
+       },
+       {
+        "id": "custom.fillOpacity",
+        "value": 0
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom",
+     "showLegend": true
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT month::timestamp AS time, ROUND(SUM(unfulfilled_packs)*100.0/NULLIF(SUM(forecast_packs),0),2) AS \"Unfulfilled Share (%)\" FROM bi.hospital_monthly GROUP BY 1 ORDER BY 1"
+    },
+    {
+     "refId": "B",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT month::timestamp AS time, 2.5 AS \"Assumed Limit (2.5%)\" FROM (SELECT DISTINCT month FROM bi.hospital_monthly) m ORDER BY 1"
+    }
+   ]
+  },
+  {
+   "id": 110,
+   "type": "bargauge",
+   "title": "Unfulfilled Demand by Hospital (Packs, Zero-Baseline)",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 14,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "decimals": 0,
+     "min": 0,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#EA580C"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": true
+    },
+    "orientation": "horizontal",
+    "displayMode": "gradient",
+    "valueMode": "color",
+    "namePlacement": "left",
+    "showUnfilled": true,
+    "minVizWidth": 8,
+    "minVizHeight": 14,
+    "text": {
+     "valueSize": 13,
+     "titleSize": 13
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT hospital_name AS \"Hospital\", u AS \"Unfulfilled Packs\" FROM (SELECT hospital_name, MAX(hospital_type) AS hospital_type, SUM(forecast_packs) AS f, SUM(consumed_packs) AS c, SUM(unfulfilled_packs) AS u, ROUND(SUM(unfulfilled_packs)*100.0/NULLIF(SUM(forecast_packs),0),2) AS pct, ROUND(AVG(avg_service_level_pct),1) AS sl FROM bi.hospital_monthly GROUP BY 1) x ORDER BY u DESC"
+    }
+   ]
+  },
+  {
+   "id": 111,
+   "type": "table",
+   "title": "Top 10 Medicines by Unfulfilled Demand",
+   "description": "",
+   "gridPos": {
+    "x": 12,
+    "y": 14,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "locale"
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Unfulfilled (%)"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "percent"
+       },
+       {
+        "id": "decimals",
+        "value": 2
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Medicine"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 170
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Therapeutic Class"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 180
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT generic_name AS \"Medicine\", therapeutic_class AS \"Therapeutic Class\", forecast_packs AS \"Forecast\", unfulfilled_packs AS \"Unfulfilled\", unfulfilled_pct AS \"Unfulfilled (%)\" FROM bi.hospital_medicine_gap ORDER BY unfulfilled_packs DESC LIMIT 10"
+    }
+   ]
+  },
+  {
+   "id": 112,
+   "type": "table",
+   "title": "Hospital Fulfillment Scorecard (All 12 Hospitals)",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 22,
+    "w": 24,
+    "h": 7
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "locale"
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Unfulfilled (%)"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "percent"
+       },
+       {
+        "id": "decimals",
+        "value": 2
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Service Level (%)"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "percent"
+       },
+       {
+        "id": "decimals",
+        "value": 1
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Hospital"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 230
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Type"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 190
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Status"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 130
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-background",
+         "mode": "basic"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "▲ On target": {
+            "color": "dark-green",
+            "index": 0
+           },
+           "▼ Below target": {
+            "color": "dark-red",
+            "index": 1
+           },
+           "▲ Within limit": {
+            "color": "dark-green",
+            "index": 2
+           },
+           "▼ Above limit": {
+            "color": "dark-red",
+            "index": 3
+           }
+          }
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT hospital_name AS \"Hospital\", hospital_type AS \"Type\", f AS \"Forecast\", c AS \"Consumed\", u AS \"Unfulfilled\", pct AS \"Unfulfilled (%)\", sl AS \"Service Level (%)\", CASE WHEN pct > 2.5 THEN '▼ Above limit' ELSE '▲ Within limit' END AS \"Status\" FROM (SELECT hospital_name, MAX(hospital_type) AS hospital_type, SUM(forecast_packs) AS f, SUM(consumed_packs) AS c, SUM(unfulfilled_packs) AS u, ROUND(SUM(unfulfilled_packs)*100.0/NULLIF(SUM(forecast_packs),0),2) AS pct, ROUND(AVG(avg_service_level_pct),1) AS sl FROM bi.hospital_monthly GROUP BY 1) x ORDER BY u DESC"
+    }
+   ]
+  },
+  {
+   "id": 113,
+   "type": "text",
+   "title": "Data Governance & Metric Contracts",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 29,
+    "w": 24,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {
+    "mode": "markdown",
+    "content": "**Governance & Data Lineage:** Records from 2026-01 onward are synthetic refresh batches made by our oversampling step. Step changes in early 2026 come from that generator, not from business performance.  \n**Metric Contracts (hover `(i)` on panels for details):** **Consumption ratio**: Consumed packs / forecast packs x 100 | Grain: Percent; hospital x medicine x month, summed | Target: >= 95% (assumed) | Exclusions: Rows with null IDs or negative consumption are rejected at staging | **Unfulfilled share of forecast**: Unfulfilled packs / forecast packs x 100 | Grain: Percent; hospital x medicine x month, summed | Target: <= 2.5% (assumed) | Exclusions: Same as above | **Change vs previous refresh**: Value after the latest BI refresh minus value after the refresh before it | Grain: Same unit as the KPI | Target: n/a | Exclusions: First refresh has no previous value"
+   }
+  }
+ ],
+ "templating": {
+  "list": []
+ },
+ "annotations": {
+  "list": []
+ }
+}

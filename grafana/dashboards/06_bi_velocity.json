@@ -1,0 +1,802 @@
+{
+ "uid": "bi-velocity",
+ "title": "BI 3 - Fast vs Slow Moving Medicines by Therapeutic Class",
+ "description": "Inventory view: fast and slow movers",
+ "tags": [
+  "pharma",
+  "bi"
+ ],
+ "timezone": "browser",
+ "schemaVersion": 39,
+ "version": 4,
+ "refresh": "10s",
+ "time": {
+  "from": "2022-12-01T00:00:00.000Z",
+  "to": "now+1y"
+ },
+ "editable": true,
+ "graphTooltip": 1,
+ "panels": [
+  {
+   "id": 127,
+   "type": "text",
+   "title": "Purpose & Decision",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {
+    "mode": "markdown",
+    "content": "**Q:** Which medicines move fastest vs slowest across therapeutic classes?  \n**Action:** Protect safety stock for top-10 movers and minimize cold-storage spoilage on slow SKUs."
+   }
+  },
+  {
+   "id": 128,
+   "type": "stat",
+   "title": "Key Takeaway (Auto-Updated on Refresh)",
+   "description": "",
+   "gridPos": {
+    "x": 7,
+    "y": 0,
+    "w": 11,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#1E3A8A"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/.*/",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto",
+    "text": {
+     "valueSize": 14
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT 'Top 10 fast-moving medicines account for ' || ROUND(SUM(units_sold) FILTER (WHERE movement = 'Fast (Top 10)') * 100.0 / SUM(units_sold), 1) || '% of all packs sold. Fastest: ' || (SELECT generic_name FROM bi.medicine_velocity ORDER BY overall_rank LIMIT 1) || '; Slowest: ' || (SELECT generic_name FROM bi.medicine_velocity ORDER BY overall_rank DESC LIMIT 1) || '.' AS takeaway FROM bi.medicine_velocity"
+    }
+   ]
+  },
+  {
+   "id": 129,
+   "type": "stat",
+   "title": "Pipeline Refresh Status",
+   "description": "",
+   "gridPos": {
+    "x": 18,
+    "y": 0,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#0F766E"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/.*/",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto",
+    "text": {
+     "valueSize": 14
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT 'Refresh #' || refresh_no || ' | ' || to_char(refreshed_at, 'YYYY-MM-DD HH24:MI') || ' UTC | Data to ' || to_char(GREATEST(sales_data_to, hospital_data_to), 'YYYY-MM-DD') AS refreshed FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1"
+    }
+   ]
+  },
+  {
+   "id": 130,
+   "type": "stat",
+   "title": "Total Packs Sold",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 3,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "decimals": 0,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#1E40AF"
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "vs Prev Refresh"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "short"
+       },
+       {
+        "id": "decimals",
+        "value": 0
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#1E293B"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "orientation": "horizontal",
+    "justifyMode": "center",
+    "text": {
+     "valueSize": 28,
+     "titleSize": 12
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT units_sold AS \"Now\", units_sold - LAG(units_sold) OVER (ORDER BY refresh_no) AS \"vs Prev Refresh\" FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1"
+    }
+   ]
+  },
+  {
+   "id": 131,
+   "type": "stat",
+   "title": "Total Net Sales (USD)",
+   "description": "",
+   "gridPos": {
+    "x": 6,
+    "y": 3,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#0F766E"
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "vs Prev Refresh"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "currencyUSD"
+       },
+       {
+        "id": "decimals",
+        "value": 1
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#1E293B"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "orientation": "horizontal",
+    "justifyMode": "center",
+    "text": {
+     "valueSize": 28,
+     "titleSize": 12
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT net_sales AS \"Now\", net_sales - LAG(net_sales) OVER (ORDER BY refresh_no) AS \"vs Prev Refresh\" FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1"
+    }
+   ]
+  },
+  {
+   "id": 132,
+   "type": "stat",
+   "title": "Top 10 Fast Movers' Share of Volume",
+   "description": "Rank of all medicines by packs sold: top 10 = Fast, bottom 10 = Slow | Grain: Packs; one row per medicine (SCD2 versions merged by MedicineID) | Target: None set | Exclusions: Only 3 of 63 medicines have ColdChainFlag = Y, so cold chain is shown as a flag",
+   "gridPos": {
+    "x": 12,
+    "y": 3,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percent",
+     "decimals": 1,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#3730A3"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "text": {
+     "valueSize": 28
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT ROUND(SUM(units_sold) FILTER (WHERE movement = 'Fast (Top 10)') * 100.0 / SUM(units_sold), 1) AS \"Share of Packs\" FROM bi.medicine_velocity"
+    }
+   ]
+  },
+  {
+   "id": 133,
+   "type": "stat",
+   "title": "Cold-Chain Flagged SKUs (ColdChainFlag = Y)",
+   "description": "",
+   "gridPos": {
+    "x": 18,
+    "y": 3,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#0369A1"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/.*/",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto",
+    "text": {
+     "valueSize": 24
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT COUNT(*) FILTER (WHERE cold_chain_flag = 'Y') || ' of ' || COUNT(*) || ' Medicines' AS flagged FROM bi.medicine_velocity"
+    }
+   ]
+  },
+  {
+   "id": 134,
+   "type": "bargauge",
+   "title": "Top 10 Fast-Moving Medicines (Packs Sold, Min=0)",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 6,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "decimals": 0,
+     "min": 0,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#059669"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": true
+    },
+    "orientation": "horizontal",
+    "displayMode": "gradient",
+    "valueMode": "color",
+    "namePlacement": "left",
+    "showUnfilled": true,
+    "minVizWidth": 8,
+    "minVizHeight": 14,
+    "text": {
+     "valueSize": 13,
+     "titleSize": 13
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT generic_name AS \"Medicine\", units_sold AS \"Packs Sold\" FROM bi.medicine_velocity WHERE movement = 'Fast (Top 10)' ORDER BY overall_rank ASC"
+    }
+   ]
+  },
+  {
+   "id": 135,
+   "type": "bargauge",
+   "title": "Bottom 10 Slow-Moving Medicines (Packs Sold, Min=0)",
+   "description": "",
+   "gridPos": {
+    "x": 12,
+    "y": 6,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "decimals": 0,
+     "min": 0,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#D97706"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": true
+    },
+    "orientation": "horizontal",
+    "displayMode": "gradient",
+    "valueMode": "color",
+    "namePlacement": "left",
+    "showUnfilled": true,
+    "minVizWidth": 8,
+    "minVizHeight": 14,
+    "text": {
+     "valueSize": 13,
+     "titleSize": 13
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT generic_name AS \"Medicine\", units_sold AS \"Packs Sold\" FROM bi.medicine_velocity WHERE movement = 'Slow (Bottom 10)' ORDER BY overall_rank DESC"
+    }
+   ]
+  },
+  {
+   "id": 136,
+   "type": "bargauge",
+   "title": "Top 10 Therapeutic Classes by Packs Sold (Min=0)",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 14,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "decimals": 0,
+     "min": 0,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#2563EB"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": true
+    },
+    "orientation": "horizontal",
+    "displayMode": "gradient",
+    "valueMode": "color",
+    "namePlacement": "left",
+    "showUnfilled": true,
+    "minVizWidth": 8,
+    "minVizHeight": 14,
+    "text": {
+     "valueSize": 13,
+     "titleSize": 13
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT therapeutic_class AS \"Therapeutic Class\", SUM(units_sold) AS \"Packs Sold\" FROM bi.medicine_velocity GROUP BY 1 ORDER BY 2 DESC LIMIT 10"
+    }
+   ]
+  },
+  {
+   "id": 137,
+   "type": "table",
+   "title": "Dedicated Cold-Chain Medicines (ColdChainFlag = Y)",
+   "description": "",
+   "gridPos": {
+    "x": 12,
+    "y": 14,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "locale"
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Rank"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 65
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Medicine"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 150
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Therapeutic Class"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 170
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT overall_rank AS \"Rank\", generic_name AS \"Medicine\", therapeutic_class AS \"Therapeutic Class\", units_sold AS \"Packs Sold\", ROUND(net_sales) AS \"Net Sales (USD)\", movement AS \"Movement\" FROM bi.medicine_velocity WHERE cold_chain_flag = 'Y' ORDER BY overall_rank"
+    }
+   ]
+  },
+  {
+   "id": 138,
+   "type": "table",
+   "title": "Fastest vs Slowest Medicine inside Each Therapeutic Class",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 22,
+    "w": 24,
+    "h": 7
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "locale"
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Therapeutic Class"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 240
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Medicine"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 200
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Class Rank"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 105
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Cold Chain"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 105
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT therapeutic_class AS \"Therapeutic Class\", generic_name AS \"Medicine\", rank_in_class AS \"Class Rank\", cold_chain_flag AS \"Cold Chain\", units_sold AS \"Packs Sold\", ROUND(net_sales) AS \"Net Sales (USD)\", movement AS \"Movement\" FROM bi.medicine_velocity m\n            WHERE rank_in_class = 1 OR rank_in_class = (SELECT MAX(rank_in_class) FROM bi.medicine_velocity x WHERE x.therapeutic_class = m.therapeutic_class)\n            ORDER BY therapeutic_class, rank_in_class"
+    }
+   ]
+  },
+  {
+   "id": 139,
+   "type": "text",
+   "title": "Data Governance & Metric Contracts",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 29,
+    "w": 24,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {
+    "mode": "markdown",
+    "content": "**Governance & Data Lineage:** Records from 2026-01 onward are synthetic refresh batches made by our oversampling step. Step changes in early 2026 come from that generator, not from business performance.  \n**Metric Contracts (hover `(i)` on panels for details):** **Fast / slow medicine**: Rank of all medicines by packs sold: top 10 = Fast, bottom 10 = Slow | Grain: Packs; one row per medicine (SCD2 versions merged by MedicineID) | Target: None set | Exclusions: Only 3 of 63 medicines have ColdChainFlag = Y, so cold chain is shown as a flag | **Change vs previous refresh**: Value after the latest BI refresh minus value after the refresh before it | Grain: Same unit as the KPI | Target: n/a | Exclusions: First refresh has no previous value"
+   }
+  }
+ ],
+ "templating": {
+  "list": []
+ },
+ "annotations": {
+  "list": []
+ }
+}

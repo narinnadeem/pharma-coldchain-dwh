@@ -1,6 +1,6 @@
 """Phase 1 SDI pipeline (Airflow 3).
 
-generate -> ingest + validate -> star schema -> analytical queries -> collect DE metrics
+generate -> ingest + validate -> star schema -> analytical queries -> collect DE metrics -> publish BI tables
 Each task only calls one function from scripts/, so the DAG file stays a thin orchestration layer.
 """
 import os
@@ -28,7 +28,7 @@ default_args = {
     start_date=datetime(2026, 1, 1),
     catchup=False,
     max_active_runs=1,
-    tags=["pharma", "coldchain", "milestone1"],
+    tags=["pharma", "coldchain", "milestone1", "milestone2"],
 )
 def phase1_sdi_pipeline():
 
@@ -57,11 +57,17 @@ def phase1_sdi_pipeline():
         from scripts.collect_metrics import collect_all
         collect_all()
 
+    @task
+    def publish_bi_tables():
+        from scripts.build_bi_layer import run_bi_layer
+        run_bi_layer()
+
     (synthesize_incremental_batches()
      >> stage_and_validate_postgres()
      >> transform_duckdb_star_schema()
      >> run_analytical_and_storage_queries()
-     >> collect_pipeline_metrics())
+     >> collect_pipeline_metrics()
+     >> publish_bi_tables())
 
 
 phase1_sdi_pipeline()

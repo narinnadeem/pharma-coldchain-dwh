@@ -1,0 +1,1114 @@
+{
+ "uid": "bi-channel",
+ "title": "BI 2 - Channel Revenue Split and Gross Margin",
+ "description": "Commercial view: revenue and margin by channel group",
+ "tags": [
+  "pharma",
+  "bi"
+ ],
+ "timezone": "browser",
+ "schemaVersion": 39,
+ "version": 4,
+ "refresh": "10s",
+ "time": {
+  "from": "2022-12-01T00:00:00.000Z",
+  "to": "now+1y"
+ },
+ "editable": true,
+ "graphTooltip": 1,
+ "panels": [
+  {
+   "id": 114,
+   "type": "text",
+   "title": "Purpose & Decision",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {
+    "mode": "markdown",
+    "content": "**Q:** Which sales channel drives revenue, and how do gross margins compare?  \n**Action:** Allocate commercial sales effort and review discounting across Retail, Hospital, and E-commerce."
+   }
+  },
+  {
+   "id": 115,
+   "type": "stat",
+   "title": "Key Takeaway (Auto-Updated on Refresh)",
+   "description": "",
+   "gridPos": {
+    "x": 7,
+    "y": 0,
+    "w": 11,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#1E3A8A"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/.*/",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto",
+    "text": {
+     "valueSize": 14
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT a.channel_group || ' generates ' || a.share || '% of net sales. Overall gross margin is ' || ROUND(k.gross_margin_pct,2) || '% (' || CASE WHEN k.gross_margin_pct >= 21.0 THEN 'on target' ELSE 'below 21% target' END || '); margin spread across channels is only ' || ROUND(b.spread,2) || ' pts - channel growth is driven by volume.' AS takeaway FROM (SELECT * FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1) k, (SELECT channel_group, share FROM (SELECT channel_group, SUM(net_sales) AS ns, SUM(gross_margin) AS gm, SUM(units_sold) AS u, SUM(transactions) AS tx, ROUND(SUM(gross_margin)*100.0/NULLIF(SUM(net_sales),0),2) AS m, ROUND(SUM(net_sales)*100.0/SUM(SUM(net_sales)) OVER (),1) AS share FROM bi.channel_monthly GROUP BY 1) x ORDER BY ns DESC LIMIT 1) a, (SELECT MAX(m) - MIN(m) AS spread FROM (SELECT channel_group, SUM(net_sales) AS ns, SUM(gross_margin) AS gm, SUM(units_sold) AS u, SUM(transactions) AS tx, ROUND(SUM(gross_margin)*100.0/NULLIF(SUM(net_sales),0),2) AS m, ROUND(SUM(net_sales)*100.0/SUM(SUM(net_sales)) OVER (),1) AS share FROM bi.channel_monthly GROUP BY 1) y) b"
+    }
+   ]
+  },
+  {
+   "id": 116,
+   "type": "stat",
+   "title": "Pipeline Refresh Status",
+   "description": "",
+   "gridPos": {
+    "x": 18,
+    "y": 0,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#0F766E"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/.*/",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto",
+    "text": {
+     "valueSize": 14
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT 'Refresh #' || refresh_no || ' | ' || to_char(refreshed_at, 'YYYY-MM-DD HH24:MI') || ' UTC | Data to ' || to_char(GREATEST(sales_data_to, hospital_data_to), 'YYYY-MM-DD') AS refreshed FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1"
+    }
+   ]
+  },
+  {
+   "id": 117,
+   "type": "stat",
+   "title": "Total Net Sales (USD)",
+   "description": "Gross sales minus discount | Grain: USD; one row per sales transaction, summed | Target: None set | Exclusions: Rows with null IDs or price <= 0 are rejected at staging",
+   "gridPos": {
+    "x": 0,
+    "y": 3,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#1E40AF"
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "vs Prev Refresh"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "currencyUSD"
+       },
+       {
+        "id": "decimals",
+        "value": 1
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#1E293B"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "orientation": "horizontal",
+    "justifyMode": "center",
+    "text": {
+     "valueSize": 28,
+     "titleSize": 12
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT net_sales AS \"Now\", net_sales - LAG(net_sales) OVER (ORDER BY refresh_no) AS \"vs Prev Refresh\" FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1"
+    }
+   ]
+  },
+  {
+   "id": 118,
+   "type": "stat",
+   "title": "Total Gross Margin (USD)",
+   "description": "",
+   "gridPos": {
+    "x": 6,
+    "y": 3,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#0F766E"
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "vs Prev Refresh"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "currencyUSD"
+       },
+       {
+        "id": "decimals",
+        "value": 1
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#1E293B"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "orientation": "horizontal",
+    "justifyMode": "center",
+    "text": {
+     "valueSize": 28,
+     "titleSize": 12
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT gross_margin AS \"Now\", gross_margin - LAG(gross_margin) OVER (ORDER BY refresh_no) AS \"vs Prev Refresh\" FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1"
+    }
+   ]
+  },
+  {
+   "id": 119,
+   "type": "stat",
+   "title": "Gross Margin % (Target >= 21%)",
+   "description": "(Net sales - cost of goods sold) / net sales x 100 | Grain: Percent; per channel group and month | Target: >= 21% (assumed) | Exclusions: Unmatched channel keys would show as Unknown (none found)",
+   "gridPos": {
+    "x": 12,
+    "y": 3,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percent",
+     "decimals": 2,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "#B91C1C",
+        "value": null
+       },
+       {
+        "color": "#15803D",
+        "value": 21.0
+       }
+      ]
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "vs Prev Refresh"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "suffix: pts"
+       },
+       {
+        "id": "decimals",
+        "value": 2
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#1E293B"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "orientation": "horizontal",
+    "justifyMode": "center",
+    "text": {
+     "valueSize": 28,
+     "titleSize": 12
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT gross_margin_pct AS \"Now\", gross_margin_pct - LAG(gross_margin_pct) OVER (ORDER BY refresh_no) AS \"vs Prev Refresh\" FROM bi.refresh_history ORDER BY refresh_no DESC LIMIT 1"
+    }
+   ]
+  },
+  {
+   "id": 120,
+   "type": "stat",
+   "title": "Leading Channel (Revenue Share)",
+   "description": "",
+   "gridPos": {
+    "x": 18,
+    "y": 3,
+    "w": 6,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#3730A3"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "/.*/",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center",
+    "orientation": "auto",
+    "text": {
+     "valueSize": 24
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT channel_group || ' (' || share || '%)' AS largest FROM (SELECT channel_group, SUM(net_sales) AS ns, SUM(gross_margin) AS gm, SUM(units_sold) AS u, SUM(transactions) AS tx, ROUND(SUM(gross_margin)*100.0/NULLIF(SUM(net_sales),0),2) AS m, ROUND(SUM(net_sales)*100.0/SUM(SUM(net_sales)) OVER (),1) AS share FROM bi.channel_monthly GROUP BY 1) x ORDER BY ns DESC LIMIT 1"
+    }
+   ]
+  },
+  {
+   "id": 121,
+   "type": "barchart",
+   "title": "Net Sales vs Gross Margin by Channel Group (USD)",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 6,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "min": 0,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#2563EB"
+     },
+     "custom": {
+      "fillOpacity": 88,
+      "gradientMode": "none"
+     },
+     "decimals": 0
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Net Sales"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#2563EB"
+        }
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Gross Margin"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#10B981"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "orientation": "vertical",
+    "showValue": "always",
+    "stacking": "none",
+    "legend": {
+     "showLegend": true,
+     "displayMode": "list",
+     "placement": "bottom"
+    },
+    "tooltip": {
+     "mode": "single"
+    },
+    "barWidth": 0.65,
+    "groupWidth": 0.7,
+    "xTickLabelRotation": 0
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT channel_group AS \"Channel Group\", ROUND(ns) AS \"Net Sales\", ROUND(gm) AS \"Gross Margin\" FROM (SELECT channel_group, SUM(net_sales) AS ns, SUM(gross_margin) AS gm, SUM(units_sold) AS u, SUM(transactions) AS tx, ROUND(SUM(gross_margin)*100.0/NULLIF(SUM(net_sales),0),2) AS m, ROUND(SUM(net_sales)*100.0/SUM(SUM(net_sales)) OVER (),1) AS share FROM bi.channel_monthly GROUP BY 1) x ORDER BY ns DESC"
+    }
+   ]
+  },
+  {
+   "id": 122,
+   "type": "table",
+   "title": "Channel Profitability Scorecard",
+   "description": "",
+   "gridPos": {
+    "x": 12,
+    "y": 6,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "locale"
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Revenue Share (%)"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "percent"
+       },
+       {
+        "id": "decimals",
+        "value": 1
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Gross Margin (%)"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "percent"
+       },
+       {
+        "id": "decimals",
+        "value": 2
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Channel Group"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 140
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Status"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 130
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-background",
+         "mode": "basic"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "▲ On target": {
+            "color": "dark-green",
+            "index": 0
+           },
+           "▼ Below target": {
+            "color": "dark-red",
+            "index": 1
+           },
+           "▲ Within limit": {
+            "color": "dark-green",
+            "index": 2
+           },
+           "▼ Above limit": {
+            "color": "dark-red",
+            "index": 3
+           }
+          }
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT channel_group AS \"Channel Group\", u AS \"Packs Sold\", ROUND(ns) AS \"Net Sales (USD)\", share AS \"Revenue Share (%)\", m AS \"Gross Margin (%)\", CASE WHEN m >= 21.0 THEN '▲ On target' ELSE '▼ Below target' END AS \"Status\" FROM (SELECT channel_group, SUM(net_sales) AS ns, SUM(gross_margin) AS gm, SUM(units_sold) AS u, SUM(transactions) AS tx, ROUND(SUM(gross_margin)*100.0/NULLIF(SUM(net_sales),0),2) AS m, ROUND(SUM(net_sales)*100.0/SUM(SUM(net_sales)) OVER (),1) AS share FROM bi.channel_monthly GROUP BY 1) x ORDER BY ns DESC"
+    }
+   ]
+  },
+  {
+   "id": 123,
+   "type": "timeseries",
+   "title": "Monthly Net Sales Trend by Channel Group (USD)",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 14,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "custom": {
+      "drawStyle": "line",
+      "lineInterpolation": "smooth",
+      "lineWidth": 2.5,
+      "showPoints": "never",
+      "pointSize": 4,
+      "fillOpacity": 16,
+      "gradientMode": "opacity",
+      "axisLabel": "USD / Month"
+     },
+     "min": 0
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Retail"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#2563EB"
+        }
+       },
+       {
+        "id": "custom.fillOpacity",
+        "value": 15
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Hospital"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#D97706"
+        }
+       },
+       {
+        "id": "custom.fillOpacity",
+        "value": 15
+       },
+       {
+        "id": "custom.lineStyle",
+        "value": {
+         "fill": "dash",
+         "dash": [
+          8,
+          6
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "E-commerce"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#059669"
+        }
+       },
+       {
+        "id": "custom.fillOpacity",
+        "value": 15
+       },
+       {
+        "id": "custom.lineStyle",
+        "value": {
+         "fill": "dash",
+         "dash": [
+          3,
+          5
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom",
+     "showLegend": true
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT month::timestamp AS time, channel_group AS metric, SUM(net_sales) AS value FROM bi.channel_monthly GROUP BY 1,2 ORDER BY 1"
+    }
+   ]
+  },
+  {
+   "id": 124,
+   "type": "timeseries",
+   "title": "Monthly Gross Margin % Trend vs 21% Target",
+   "description": "",
+   "gridPos": {
+    "x": 12,
+    "y": 14,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percent",
+     "custom": {
+      "drawStyle": "line",
+      "lineInterpolation": "smooth",
+      "lineWidth": 2.5,
+      "showPoints": "never",
+      "pointSize": 4,
+      "fillOpacity": 16,
+      "gradientMode": "opacity",
+      "axisLabel": "Margin %"
+     },
+     "min": 15
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Retail"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#2563EB"
+        }
+       },
+       {
+        "id": "custom.fillOpacity",
+        "value": 15
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Hospital"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#D97706"
+        }
+       },
+       {
+        "id": "custom.fillOpacity",
+        "value": 15
+       },
+       {
+        "id": "custom.lineStyle",
+        "value": {
+         "fill": "dash",
+         "dash": [
+          8,
+          6
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "E-commerce"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#059669"
+        }
+       },
+       {
+        "id": "custom.fillOpacity",
+        "value": 15
+       },
+       {
+        "id": "custom.lineStyle",
+        "value": {
+         "fill": "dash",
+         "dash": [
+          3,
+          5
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Assumed Target (21%)"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#DC2626"
+        }
+       },
+       {
+        "id": "custom.lineStyle",
+        "value": {
+         "fill": "dash",
+         "dash": [
+          8,
+          6
+         ]
+        }
+       },
+       {
+        "id": "custom.fillOpacity",
+        "value": 0
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom",
+     "showLegend": true
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT month::timestamp AS time, channel_group AS metric, ROUND(SUM(gross_margin)*100.0/NULLIF(SUM(net_sales),0),2) AS value FROM bi.channel_monthly GROUP BY 1,2 ORDER BY 1"
+    },
+    {
+     "refId": "B",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "time_series",
+     "rawQuery": true,
+     "rawSql": "SELECT month::timestamp AS time, 21.0 AS \"Assumed Target (21%)\" FROM (SELECT DISTINCT month FROM bi.channel_monthly) m ORDER BY 1"
+    }
+   ]
+  },
+  {
+   "id": 125,
+   "type": "table",
+   "title": "Channel Breakdown: Sales Channel x Pharmacy Type",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 22,
+    "w": 24,
+    "h": 7
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "locale"
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Gross Margin (%)"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "percent"
+       },
+       {
+        "id": "decimals",
+        "value": 2
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Channel Group"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 140
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Sales Channel"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 170
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Pharmacy Type"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 200
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "warehouse-pg"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "warehouse-pg"
+     },
+     "editorMode": "code",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT channel_group AS \"Channel Group\", sales_channel AS \"Sales Channel\", pharmacy_type AS \"Pharmacy Type\", SUM(transactions) AS \"Transactions\", SUM(units_sold) AS \"Packs Sold\", ROUND(SUM(net_sales)) AS \"Net Sales (USD)\", ROUND(SUM(gross_margin)) AS \"Gross Margin (USD)\", ROUND(SUM(gross_margin)*100.0/NULLIF(SUM(net_sales),0),2) AS \"Gross Margin (%)\" FROM bi.channel_monthly GROUP BY 1,2,3 ORDER BY 6 DESC"
+    }
+   ]
+  },
+  {
+   "id": 126,
+   "type": "text",
+   "title": "Data Governance & Metric Contracts",
+   "description": "",
+   "gridPos": {
+    "x": 0,
+    "y": 29,
+    "w": 24,
+    "h": 3
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {
+    "mode": "markdown",
+    "content": "**Governance & Data Lineage:** Records from 2026-01 onward are synthetic refresh batches made by our oversampling step. Step changes in early 2026 come from that generator, not from business performance.  \n**Metric Contracts (hover `(i)` on panels for details):** **Net sales**: Gross sales minus discount | Grain: USD; one row per sales transaction, summed | Target: None set | Exclusions: Rows with null IDs or price <= 0 are rejected at staging | **Gross margin %**: (Net sales - cost of goods sold) / net sales x 100 | Grain: Percent; per channel group and month | Target: >= 21% (assumed) | Exclusions: Unmatched channel keys would show as Unknown (none found) | **Channel group**: E-commerce if SalesChannel contains 'commerce'; Hospital if PharmacyType contains 'hospital'; otherwise Retail | Grain: Label derived from Dim_Channel | Target: n/a | Exclusions: n/a | **Change vs previous refresh**: Value after the latest BI refresh minus value after the refresh before it | Grain: Same unit as the KPI | Target: n/a | Exclusions: First refresh has no previous value"
+   }
+  }
+ ],
+ "templating": {
+  "list": []
+ },
+ "annotations": {
+  "list": []
+ }
+}
